@@ -2,7 +2,6 @@
 ## VARIABLES ##
 ###############
 
-
 # mnake -p
 # make build CXX_STANDARD=c++14
 
@@ -22,76 +21,59 @@
 # CPPFLAGS: Extra flags to give to the C preprocessor
 # LDFAGS: Extra flags to give to the linker
 
-
 DEBUG = 1 # if 0 realese mode
-EXECUTABLE_NAME = main
+
+INCLUDE_DIR = include
+SOURCE_DIR = src
+BUILD_DIR = build
+
+
+
 
 CXX_STANDARD = c++17
 CXX_WARNINGS = -Wall -Wextra -Wpedantic
 CC = gcc
 CXX = g++
 
-# warnings
 CXXFLAGS = $(CXX_WARNINGS) -std=$(CXX_STANDARD)
+CPPFLAGS = -I $(INCLUDE_DIR) # I - include dir
 
-# dependencies
-# LDFLAGS = -lmath
 LDFAGS = 
-
 
 ifeq ($(DEBUG), 1)
 CXXFLAGS += -g -O0
 EXECUTABLE_NAME = mainDebug
 else
-CXXFLAGS += -O3 
+CXXFLAGS += -O3
 EXECUTABLE_NAME = mainRelease
 endif
 
 
-COMPILER_CALL = $(CXX) $(CXXFLAGS) 
-
-
-
-
-
-execute:
-	./$(EXECUTABLE_NAME)
-
-# buildObj:
-# g++ main.cc -c main.o
-# g++ my_lib.cc -c my_lib.o
-# combining two objects
-	# g++ main.o my_lib.0 -o main
-
+CXX_COMPILER_CALL = $(CXX) $(CXXFLAGS) $(CPPFLAGS)
 # pattern matching *.cc
-CXX_SOURCES = $(wildcard *.cc)
+CXX_SOURCES = $(wildcard $(SOURCE_DIR)/*.cc)
 
 # pattern substitution
 # $(text:pattern=replacement)
-CXX_OBJECTS = $(patsubst %.cc, $.o, $(CXX_SOURCES))
-
-# CXX_OBJECTS = my_lib.o main.o
-
+CXX_OBJECTS = $(patsubst $(SOURCE_DIR)/%.cc, $(BUILD_DIR)/%.o, $(CXX_SOURCES))
 
 ###################
 # TARGETS
 ###################
 
-build: $(CXX_OBJECTS)
-	$(COMPILER_CALL) $(CXX_OBJECTS) $(LDFLAGS) -o $(EXECUTABLE_NAME)
-	
-main.o:
-# g++ main.cc -c main.o
-	$(COMPILER_CALL) main.cc -c main.o
+create:
+	mkdir build
 
-my_lib.o:
-# g++ my_lib.cc -c my_lib.o
-	$(COMPILER_CALL) my_lib.cc -c my_lib.o
+build: create $(CXX_OBJECTS)
+	$(CXX_COMPILER_CALL) $(CXX_OBJECTS) $(LDFLAGS) -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+
+execute:
+	./$(BUILD_DIR)/$(EXECUTABLE_NAME)
 
 # Clean is often used as a targety that removes the output of other targets
 clean:
-	rm -f main
-	rm -f *.o
+	rm -f $(BUILD_DIR)/*.o
+	rm -f $(BUILD_DIR)/$(EXECUTABLE_NAME)
 
 
 
@@ -104,15 +86,5 @@ clean:
 # $@: the file name of the target
 # $<: the name of the first ependency
 # $^: the names of all prerequistities
-%.o: %.cc # 'template' - define once
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cc
 	$(CXX_COMPILER_CALL) -c $< -o $@
-
-# %.o: %.cpp # 'template' - define once
-# 	$(CXX_COMPILER_CALL) -c $< -o $@
-
-# %.o: %.cxx # 'template' - define once
-# 	$(CXX_COMPILER_CALL) -c $< -o $@
-
-# explanation
-# main.o: main.cc
-# 	$(CXX_COMPILER_CALL) -c $< -o $@
