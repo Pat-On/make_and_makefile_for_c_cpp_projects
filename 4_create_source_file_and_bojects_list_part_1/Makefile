@@ -48,7 +48,7 @@ endif
 
 COMPILER_CALL = $(CXX) $(CXXFLAGS) 
 
-
+CXX_OBJECTS = my_lib.o main.o
 
 
 
@@ -61,10 +61,11 @@ execute:
 # combining two objects
 	# g++ main.o my_lib.0 -o main
 
-build: my_lib.o main.o
+build: $(CXX_OBJECTS)
 	echo $(COMPILER_CALL)
 # g++ main.o my_lib.o -o main
-	$(COMPILER_CALL) main.o my_lib.o $(LDFLAGS) -o $(EXECUTABLE_NAME)
+	$(COMPILER_CALL) $(CXX_OBJECTS) $(LDFLAGS) -o $(EXECUTABLE_NAME)
+	
 main.o:
 # g++ main.cc -c main.o
 	$(COMPILER_CALL) main.cc -c main.o
@@ -78,3 +79,26 @@ clean:
 	rm -f main
 	rm -f *.o
 
+
+
+############################
+
+######		PATTERNS	#####
+
+############################
+
+# $@: the file name of the target
+# $<: the name of the first ependency
+# $^: the names of all prerequistities
+%.o: %.cc # 'template' - define once
+	$(CXX_COMPILER_CALL) -c $< -o $@
+
+# %.o: %.cpp # 'template' - define once
+# 	$(CXX_COMPILER_CALL) -c $< -o $@
+
+# %.o: %.cxx # 'template' - define once
+# 	$(CXX_COMPILER_CALL) -c $< -o $@
+
+# explanation
+# main.o: main.cc
+# 	$(CXX_COMPILER_CALL) -c $< -o $@
