@@ -41,19 +41,21 @@ LDFAGS =
 
 ifeq ($(DEBUG), 1)
 CXXFLAGS += -g -O0
+EXECUTABLE_NAME = mainDebug
 else
 CXXFLAGS += -O3 
+EXECUTABLE_NAME = mainRelease
 endif
 
 
 COMPILER_CALL = $(CXX) $(CXXFLAGS) 
 
-CXX_OBJECTS = my_lib.o main.o
+
 
 
 
 execute:
-	./main
+	./$(EXECUTABLE_NAME)
 
 # buildObj:
 # g++ main.cc -c main.o
@@ -61,9 +63,21 @@ execute:
 # combining two objects
 	# g++ main.o my_lib.0 -o main
 
+# pattern matching *.cc
+CXX_SOURCES = $(wildcard *.cc)
+
+# pattern substitution
+# $(text:pattern=replacement)
+CXX_OBJECTS = $(patsubst %.cc, $.o, $(CXX_SOURCES))
+
+# CXX_OBJECTS = my_lib.o main.o
+
+
+###################
+# TARGETS
+###################
+
 build: $(CXX_OBJECTS)
-	echo $(COMPILER_CALL)
-# g++ main.o my_lib.o -o main
 	$(COMPILER_CALL) $(CXX_OBJECTS) $(LDFLAGS) -o $(EXECUTABLE_NAME)
 	
 main.o:
