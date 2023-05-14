@@ -22,22 +22,29 @@
 # LDFAGS: Extra flags to give to the linker
 
 DEBUG = 1 # if 0 realese mode
+ENABLE_WARNINGS = 1
+WARNINGS_AS_ERRORS = 0
 
 INCLUDE_DIR = include
 SOURCE_DIR = src
 BUILD_DIR = build
 
-
-
+# WARNING
+ifeq ($(ENABLE_WARNINGS), 1)
+CXX_WARNINGS = -Wall -Wextra -Wpedantic
+else
+CXX_WARNINGS =
+endif
+# WARNINGS AS AN ERROR
+ifeq ($(WARNINGS_AS_ERRORS), 1)
+CXX_WARNINGS += -Werror
+endif
 
 CXX_STANDARD = c++17
-CXX_WARNINGS = -Wall -Wextra -Wpedantic
-CC = gcc
 CXX = g++
 
 CXXFLAGS = $(CXX_WARNINGS) -std=$(CXX_STANDARD)
 CPPFLAGS = -I $(INCLUDE_DIR) # I - include dir
-
 LDFAGS = 
 
 ifeq ($(DEBUG), 1)
@@ -88,3 +95,13 @@ clean:
 # $^: the names of all prerequistities
 $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cc
 	$(CXX_COMPILER_CALL) -c $< -o $@
+
+
+
+##########
+# phony - when it is not corresponding to the file but execute only commands 
+# it is more explicit way of deffining that this commands are defined in this file
+##########
+
+
+.PHONY: create build execute clean
